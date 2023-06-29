@@ -6,27 +6,27 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
 
-    File file = new File("C:\\users\\admin\\downloads\\workbook.xlsx");   //creating a new file instance
-    FileInputStream fis = new FileInputStream(file);   //obtaining bytes from the file
-    XSSFWorkbook wb = new XSSFWorkbook(fis); //creating Workbook instance that refers to .xlsx file
-    XSSFSheet sheet = wb.getSheetAt(0);     //creating a Sheet object to retrieve object
+
+
+    File file;   //creating a new file instance
+    FileInputStream fis;   //obtaining bytes from the file
+    XSSFWorkbook wb; //creating Workbook instance that refers to .xlsx file
+    XSSFSheet sheet;     //creating a Sheet object to retrieve object
     List<String> previousList = new ArrayList<>();
     List<String> nowList = new ArrayList<>();
     List<String> uniqueList;
     File now = new File("now.txt");
     File previous = new File("previous.txt");
-    int lastRowNumber = sheet.getLastRowNum();
+    int lastRowNumber;
     int columnNumber = 13;
     List<String> uniquePhoneList = new ArrayList<>();
 
@@ -34,16 +34,23 @@ public class Main {
     public Main() throws IOException {
     }
 
-    public static void main(String[] args) throws IOException {
-        Main mn = new Main();
-        mn.makeNowList();
-        mn.makePreviousList();
-        mn.makeUniqueList();
-        for (String str : mn.uniqueList) {
+    public void initiateFile(String path) throws IOException {
+        file = new File(path);
+        fis = new FileInputStream(file);
+        wb = new XSSFWorkbook(fis);
+        sheet = wb.getSheetAt(0);
+        lastRowNumber = sheet.getLastRowNum();
+    }
+
+    public void runApp() throws IOException {
+        makeNowList();
+        makePreviousList();
+        makeUniqueList();
+        for (String str : uniqueList) {
             System.out.println(str);
         }
-        mn.makeUniquePhoneList();
-        for (String str : mn.uniquePhoneList) {
+        makeUniquePhoneList();
+        for (String str : uniquePhoneList) {
             System.out.println(str);
         }
 
@@ -89,5 +96,7 @@ public class Main {
         }
         fileWriter.close();
     }
+
+
 }
 
