@@ -1,23 +1,25 @@
 package org.example;
 
-import java.awt.*;
-import java.io.*;
 import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import java.awt.event.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 
-public class formExe extends JPanel implements ActionListener {
+public class FormExe extends JPanel implements ActionListener {
 
     static private final String newline = "\n";
     JButton openButton;
     JButton createButton;
+    JButton saveButton;
     JTextArea log;
     JFileChooser fc;
     Main main = new Main();
 
 
-    public formExe() throws IOException {
+    public FormExe() throws IOException {
         super(new BorderLayout());
 
         log = new JTextArea(5, 20);
@@ -27,7 +29,7 @@ public class formExe extends JPanel implements ActionListener {
 
         fc = new JFileChooser();
         fc.setFileFilter(new FileNameExtensionFilter("Excel Files", "xlsx"));
-        fc.setCurrentDirectory(new File(System.getProperty("user.home") + System.getProperty("file.separator")+ "Downloads"));
+        fc.setCurrentDirectory(new File(System.getProperty("user.home") + System.getProperty("file.separator") + "Downloads"));
 
         Icon iconOpen = new ImageIcon("Open16.gif");
         openButton = new JButton("Open a file...", iconOpen);
@@ -42,12 +44,20 @@ public class formExe extends JPanel implements ActionListener {
         createButton.setMargin(buttonMarigin);
         createButton.addActionListener(this);
 
+        Icon iconSave = new ImageIcon("save.gif");
+        saveButton = new JButton("Save...", iconSave);
+        saveButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        saveButton.setMargin(buttonMarigin);
+        saveButton.addActionListener(this);
+
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS)); // BoxLayout of buttonPanel
         buttonPanel.add(Box.createRigidArea(new Dimension(5, 10)));
         buttonPanel.add(openButton);
         buttonPanel.add(Box.createRigidArea(new Dimension(5, 10)));
         buttonPanel.add(createButton);
+        buttonPanel.add(Box.createRigidArea(new Dimension(5, 10)));
+        buttonPanel.add(saveButton);
         buttonPanel.add(Box.createRigidArea(new Dimension(5, 10)));
 
         add(buttonPanel, BorderLayout.PAGE_START);
@@ -58,6 +68,19 @@ public class formExe extends JPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == saveButton) {
+            try {
+                main.writeListIntoFile(main.nowList, "previous.txt");
+                if (main.nowList.isEmpty()) {
+                    log.append("List is empty!" + newline);
+                } else {
+                    log.append("Saved to file previous.txt" + newline);
+
+                }
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
         if (e.getSource() == createButton) {
             try {
                 main.runApp();
@@ -71,7 +94,7 @@ public class formExe extends JPanel implements ActionListener {
 
         }
         if (e.getSource() == openButton) {
-            int returnVal = fc.showOpenDialog(formExe.this);
+            int returnVal = fc.showOpenDialog(FormExe.this);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 File file = fc.getSelectedFile();
                 String path = file.getPath();
@@ -99,7 +122,7 @@ public class formExe extends JPanel implements ActionListener {
         frame.setSize(800, 800);
 
         //Add content to the window.
-        frame.add(new formExe());
+        frame.add(new FormExe());
 
         //Display the window.
         frame.setVisible(true);

@@ -6,15 +6,16 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
-
 
 
     File file;   //creating a new file instance
@@ -24,11 +25,10 @@ public class Main {
     List<String> previousList = new ArrayList<>();
     List<String> nowList = new ArrayList<>();
     List<String> uniqueList;
-    File now = new File("now.txt");
-    File previous = new File("previous.txt");
     int lastRowNumber;
     int columnNumber = 13;
     List<String> uniquePhoneList = new ArrayList<>();
+
 
 
     public Main() throws IOException {
@@ -89,14 +89,17 @@ public class Main {
     }
 
     public void writeListIntoFile(List<String> list, String pathName) throws IOException {
-        File file = new File(pathName);
-        FileWriter fileWriter = new FileWriter(file);
-        for (String str : list) {
-            fileWriter.write(str + System.lineSeparator());
+        if (!list.isEmpty()) {
+            File file = new File(pathName);
+            FileWriter fileWriter = new FileWriter(file);
+            for (String str : list) {
+                fileWriter.write(str + System.lineSeparator());
+            }
+            fileWriter.close();
+        } else {
+            System.out.println("Lista jest pusta!");
         }
-        fileWriter.close();
     }
-
 
 }
 
