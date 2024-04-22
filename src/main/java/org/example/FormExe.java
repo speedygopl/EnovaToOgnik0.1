@@ -11,9 +11,9 @@ import java.io.IOException;
 public class FormExe extends JPanel implements ActionListener {
 
     static private final String newline = "\n";
-    JButton openButton;
-    JButton createButton;
-    JButton saveButton;
+    JButton openButtonEnova;
+    JButton openButtonPlan;
+    JButton convertButton;
     JTextArea log;
     JFileChooser fc;
     Main main = new Main();
@@ -31,34 +31,42 @@ public class FormExe extends JPanel implements ActionListener {
         fc.setFileFilter(new FileNameExtensionFilter("Excel Files", "xlsx"));
         fc.setCurrentDirectory(new File(System.getProperty("user.home") + System.getProperty("file.separator") + "Downloads"));
 
-        Icon iconOpen = new ImageIcon("Open16.gif");
-        openButton = new JButton("Open a file...", iconOpen);
-        openButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        Icon iconOpen = new ImageIcon("src/main/resources/Open16.gif");
+        openButtonEnova = new JButton("Otwórz plik Enova", iconOpen);
+        openButtonEnova.setPreferredSize(new Dimension(200,50));
+        openButtonEnova.setMaximumSize(new Dimension(200, 50));
+        openButtonEnova.setMinimumSize(new Dimension(200, 50));
+        openButtonEnova.setAlignmentX(Component.CENTER_ALIGNMENT);
         Insets buttonMarigin = new Insets(5, 0, 5, 0);
-        openButton.setMargin(buttonMarigin);
-        openButton.addActionListener(this);
+        openButtonEnova.setMargin(buttonMarigin);
+        openButtonEnova.addActionListener(this);
 
-        Icon iconCreate = new ImageIcon("phone.gif");
-        createButton = new JButton("Create Phone List...", iconCreate);
-        createButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        createButton.setMargin(buttonMarigin);
-        createButton.addActionListener(this);
+        openButtonPlan = new JButton("Otwórz plik Plan Kont", iconOpen);
+        openButtonPlan.setPreferredSize(new Dimension(200,50));
+        openButtonPlan.setMaximumSize(new Dimension(200, 50));
+        openButtonPlan.setMinimumSize(new Dimension(200, 50));
+        openButtonPlan.setAlignmentX(Component.CENTER_ALIGNMENT);
+        openButtonPlan.setMargin(buttonMarigin);
+        openButtonPlan.addActionListener(this);
 
-        Icon iconSave = new ImageIcon("save.gif");
-        saveButton = new JButton("Save...", iconSave);
-        saveButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        saveButton.setMargin(buttonMarigin);
-        saveButton.addActionListener(this);
+        Icon iconConvert = new ImageIcon("src/main/resources/save.gif");
+        convertButton = new JButton("Konwertuj...", iconConvert);
+        convertButton.setPreferredSize(new Dimension(200,50));
+        convertButton.setMaximumSize(new Dimension(200, 50));
+        convertButton.setMinimumSize(new Dimension(200, 50));
+        convertButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        convertButton.setMargin(buttonMarigin);
+        convertButton.addActionListener(this);
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS)); // BoxLayout of buttonPanel
-        buttonPanel.add(Box.createRigidArea(new Dimension(5, 10)));
-        buttonPanel.add(openButton);
-        buttonPanel.add(Box.createRigidArea(new Dimension(5, 10)));
-        buttonPanel.add(createButton);
-        buttonPanel.add(Box.createRigidArea(new Dimension(5, 10)));
-        buttonPanel.add(saveButton);
-        buttonPanel.add(Box.createRigidArea(new Dimension(5, 10)));
+        buttonPanel.add(Box.createRigidArea(new Dimension(20, 10)));
+        buttonPanel.add(openButtonEnova);
+        buttonPanel.add(Box.createRigidArea(new Dimension(20, 10)));
+        buttonPanel.add(openButtonPlan);
+        buttonPanel.add(Box.createRigidArea(new Dimension(20, 10)));
+        buttonPanel.add(convertButton);
+        buttonPanel.add(Box.createRigidArea(new Dimension(20, 10)));
 
         add(buttonPanel, BorderLayout.PAGE_START);
         add(logScrollPane, BorderLayout.CENTER);
@@ -68,7 +76,7 @@ public class FormExe extends JPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == saveButton) {
+        if (e.getSource() == convertButton) {
             try {
                 main.writeListIntoFile(main.nowList, "previous.txt");
                 if (main.nowList.isEmpty()) {
@@ -81,7 +89,7 @@ public class FormExe extends JPanel implements ActionListener {
                 throw new RuntimeException(ex);
             }
         }
-        if (e.getSource() == createButton) {
+        if (e.getSource() == openButtonPlan) {
             try {
                 main.runApp();
                 for (String s : main.uniquePhoneList) {
@@ -93,13 +101,13 @@ public class FormExe extends JPanel implements ActionListener {
             }
 
         }
-        if (e.getSource() == openButton) {
+        if (e.getSource() == openButtonEnova) {
             int returnVal = fc.showOpenDialog(FormExe.this);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 File file = fc.getSelectedFile();
                 String path = file.getPath();
                 try {
-                    main.initiateFile(path);
+                    main.initiateFileEnova(path);
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }

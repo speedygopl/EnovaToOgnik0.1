@@ -3,6 +3,7 @@ package org.example;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -12,20 +13,24 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Main {
 
 
-    File file;   //creating a new file instance
-    FileInputStream fis;   //obtaining bytes from the file
-    XSSFWorkbook wb; //creating Workbook instance that refers to .xlsx file
-    XSSFSheet sheet;     //creating a Sheet object to retrieve object
+    File fileEnova;   //creating a new file Enova instance
+    FileInputStream fisEnova;   //obtaining bytes from the file Enova
+    XSSFWorkbook wbEnova; //creating Workbook instance that refers to .xlsx file Enova
+    XSSFSheet sheetEnova;     //creating a Sheet Enova object to retrieve object
     List<String> previousList = new ArrayList<>();
     List<String> nowList = new ArrayList<>();
     List<String> uniqueList;
-    int lastRowNumber;
+    int lastRowNumberEnova;
     int columnNumber = 13;
     List<String> uniquePhoneList = new ArrayList<>();
 
@@ -34,12 +39,22 @@ public class Main {
     public Main() throws IOException {
     }
 
-    public void initiateFile(String path) throws IOException {
-        file = new File(path);
-        fis = new FileInputStream(file);
-        wb = new XSSFWorkbook(fis);
-        sheet = wb.getSheetAt(0);
-        lastRowNumber = sheet.getLastRowNum();
+    public void initiateFileEnova(String path) throws IOException {
+        fileEnova = new File(path);
+        fisEnova = new FileInputStream(fileEnova);
+        wbEnova = new XSSFWorkbook(fisEnova);
+        sheetEnova = wbEnova.getSheetAt(0);
+        lastRowNumberEnova = sheetEnova.getLastRowNum();
+        XSSFCell cell = sheetEnova.getRow(1).getCell(1);
+        Date dataDokumentu = cell.getDateCellValue();
+        LocalDate localDate = dataDokumentu.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        String formatedDate = localDate.format(formatter);
+        System.out.println(formatedDate);
+        String[] split = formatedDate.split("-");
+        int i = Integer.valueOf(split[1]) - 1;
+        System.out.println(i);
+
     }
 
     public void runApp() throws IOException {
@@ -61,9 +76,9 @@ public class Main {
     }
 
     public void makeNowList() {
-        System.out.println("lastRowNumber = " + lastRowNumber);
-        for (int i = 1; i <= lastRowNumber; i++) {
-            Row row = sheet.getRow(i);
+        System.out.println("lastRowNumber = " + lastRowNumberEnova);
+        for (int i = 1; i <= lastRowNumberEnova; i++) {
+            Row row = sheetEnova.getRow(i);
             Cell cell = row.getCell(columnNumber);
             nowList.add(cell.toString());
         }
@@ -76,8 +91,8 @@ public class Main {
 
     public void makeUniquePhoneList() {
         for (String str : uniqueList) {
-            for (int i = 1; i <= lastRowNumber; i++) {
-                Row row = sheet.getRow(i);
+            for (int i = 1; i <= lastRowNumberEnova; i++) {
+                Row row = sheetEnova.getRow(i);
                 Cell cell = row.getCell(columnNumber);
                 if (cell.toString().equals(str) && row.getCell(5) != null) {
                     Cell phoneCell = row.getCell(5);
