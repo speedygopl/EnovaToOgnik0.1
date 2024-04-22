@@ -14,11 +14,14 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Main {
 
@@ -27,13 +30,17 @@ public class Main {
     FileInputStream fisEnova;   //obtaining bytes from the file Enova
     XSSFWorkbook wbEnova; //creating Workbook instance that refers to .xlsx file Enova
     XSSFSheet sheetEnova;     //creating a Sheet Enova object to retrieve object
+    OgnikClass ognikClass = new OgnikClass();
+    int fiscalMonth;
+    int fiscalYear = 2024;
+    int lastDayOfFiscalMonth;
+
     List<String> previousList = new ArrayList<>();
     List<String> nowList = new ArrayList<>();
     List<String> uniqueList;
     int lastRowNumberEnova;
     int columnNumber = 13;
     List<String> uniquePhoneList = new ArrayList<>();
-
 
 
     public Main() throws IOException {
@@ -45,16 +52,61 @@ public class Main {
         wbEnova = new XSSFWorkbook(fisEnova);
         sheetEnova = wbEnova.getSheetAt(0);
         lastRowNumberEnova = sheetEnova.getLastRowNum();
-        XSSFCell cell = sheetEnova.getRow(1).getCell(1);
-        Date dataDokumentu = cell.getDateCellValue();
-        LocalDate localDate = dataDokumentu.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        String formatedDate = localDate.format(formatter);
-        System.out.println(formatedDate);
-        String[] split = formatedDate.split("-");
-        int i = Integer.valueOf(split[1]) - 1;
-        System.out.println(i);
+        setFiscalMonth();
+        createNumerDokumentu();
+        createDataDokumentu();
+        createOpisDokumentu();
+        createDataKsiegowaniaDataZdarzenia();
+        System.out.println(ognikClass.toString());
 
+    }
+
+    public void createNumerDokumentu() {
+        final XSSFCell cell1 = sheetEnova.getRow(1).getCell(2);
+        String input = cell1.toString();
+        String regex = "\\((\\d+)\\)";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(input);
+        if (matcher.find()) {
+            String extractedValue = matcher.group(1);
+            System.out.println("Extracted value: " + extractedValue);
+        } else {
+            System.out.println("No match found.");
+        }
+        ognikClass.setNumerDokumentu("1/" + (fiscalMonth <= 9 ? "0" + fiscalMonth : fiscalMonth) + "/" + matcher.group(1) + "/"+fiscalYear); //set document number in OgnikClass
+
+    }
+
+    public void setFiscalMonth(){ //should run before other methods
+        XSSFCell cell = sheetEnova.getRow(1).getCell(1);
+        Date date = cell.getDateCellValue();
+        LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        String formattedDate = localDate.format(formatter);
+        String[] split = formattedDate.split("-");
+        fiscalMonth = Integer.valueOf(split[1]) - 1;
+    }
+
+    public void createDataDokumentu() {
+        XSSFCell cell = sheetEnova.getRow(1).getCell(1);
+        Date date = cell.getDateCellValue();
+        LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        ognikClass.setDataDokumentu(localDate); // set document date in OgnikClass
+    }
+
+    public void createOpisDokumentu() {
+        final XSSFCell cell1 = sheetEnova.getRow(1).getCell(2);
+        String[] opisDokumentuArray = cell1.toString().split("\\((\\d+)\\)");
+        String opisDokumentuPart = opisDokumentuArray[0];
+        ognikClass.setOpisDokumentu(ognikClass.getNumerDokumentu() + " " + opisDokumentuPart);
+    }
+
+    public void createDataKsiegowaniaDataZdarzenia(){
+        YearMonth yearMonth = YearMonth.of(fiscalYear, fiscalMonth);
+        lastDayOfFiscalMonth = yearMonth.lengthOfMonth();
+        LocalDate specificLocalDate = LocalDate.of(fiscalYear, fiscalMonth, lastDayOfFiscalMonth);
+        ognikClass.setDataKsiegowania(specificLocalDate);
+        ognikClass.setDataZdarzenia(specificLocalDate);
     }
 
     public void runApp() throws IOException {
