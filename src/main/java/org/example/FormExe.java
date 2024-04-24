@@ -77,30 +77,29 @@ public class FormExe extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == convertButton) {
-            try {
-                main.writeListIntoFile(main.nowList, "previous.txt");
-                if (main.nowList.isEmpty()) {
-                    log.append("List is empty!" + newline);
-                } else {
-                    log.append("Saved to file previous.txt" + newline);
 
-                }
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
         }
         if (e.getSource() == openButtonPlan) {
-            try {
-                main.runApp();
-                for (String s : main.uniquePhoneList) {
-                    log.append(s + newline);
+            int returnVal = fc.showOpenDialog(FormExe.this);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                File file = fc.getSelectedFile();
+                String path = file.getPath();
+                try {
+                    main.initiateFilePlan(path);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
                 }
+                log.append("Opening: " + file.getName() + "." + newline);
+                log.append("Path to file : " + path + newline);
 
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
+            } else {
+                log.append("Open command cancelled by user." + newline);
             }
-
         }
+        log.setCaretPosition(log.getDocument().getLength());
+
+
+
         if (e.getSource() == openButtonEnova) {
             int returnVal = fc.showOpenDialog(FormExe.this);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
