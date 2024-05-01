@@ -33,7 +33,10 @@ public class Main {
     int lastDayOfFiscalMonth;
     List<List<Map<String, String>>> listOfListsOfMaps = new ArrayList<>();
     List<Map<String, String>> listOfMaps = new ArrayList<>();
-    Map<String, String> mapOfStrings = new HashMap<>();
+    Map<String, String> mapWynagrodzenieOpiekuna = new LinkedHashMap<>();
+    Map<String, String> mapSkladkiZusPracodawcy = new LinkedHashMap<>();
+    Map<String, String> mapSkladkiZusPracownika = new LinkedHashMap<>();
+    Map<String, String> mapPodatekPit4 = new LinkedHashMap<>();
     int lastRowNumberEnova;
     int lastRowNumberPlan;
 
@@ -47,7 +50,6 @@ public class Main {
         wbEnova = new XSSFWorkbook(fisEnova);
         sheetEnova = wbEnova.getSheetAt(0);
         lastRowNumberEnova = sheetEnova.getLastRowNum();
-
     }
 
     public void initiateFilePlan(String path) throws IOException {
@@ -56,16 +58,14 @@ public class Main {
         wbPlan = new XSSFWorkbook(fisPlan);
         sheetPlan = wbPlan.getSheetAt(0);
         lastRowNumberPlan = sheetPlan.getLastRowNum();
-        findCodeIntoPlanKontByName();
-
     }
 
-    public String findCodeIntoPlanKontByName(){
-        String code ="";
-        for(int i = 1; i <= lastRowNumberPlan; i++) {
+    public String findCodeIntoPlanKontByName(String name) {
+        String code = "";
+        for (int i = 1; i <= lastRowNumberPlan; i++) {
             XSSFCell cell = sheetPlan.getRow(i).getCell(2);
-            System.out.println(cell.toString());
-            if (cell.toString().contains("Marczak Izabela")){
+            if (cell.toString().contains(name)) {
+                System.out.println(cell.toString());
                 System.out.println(sheetPlan.getRow(i).getCell(0).toString());
                 return sheetPlan.getRow(i).getCell(0).toString();
             } else {
@@ -77,8 +77,8 @@ public class Main {
     }
 
 
-    public String createNumerDokumentu() {
-        final XSSFCell cell1 = sheetEnova.getRow(1).getCell(2);
+    public String createNumerDokumentu(int i) {
+        final XSSFCell cell1 = sheetEnova.getRow(i).getCell(2);
         String input = cell1.toString();
         String regex = "\\((\\d+)\\)";
         Pattern pattern = Pattern.compile(regex);
@@ -103,18 +103,18 @@ public class Main {
         fiscalMonth = Integer.valueOf(split[1]) - 1;
     }
 
-    public String createDataDokumentu() {
-        XSSFCell cell = sheetEnova.getRow(1).getCell(1);
+    public String createDataDokumentu(int i) {
+        XSSFCell cell = sheetEnova.getRow(i).getCell(1);
         Date date = cell.getDateCellValue();
         LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         return localDate.toString();
     }
 
-    public String createOpisDokumentu() {
-        final XSSFCell cell1 = sheetEnova.getRow(1).getCell(2);
+    public String createOpisDokumentu(int i) {
+        final XSSFCell cell1 = sheetEnova.getRow(i).getCell(2);
         String[] opisDokumentuArray = cell1.toString().split("\\((\\d+)\\)");
         String opisDokumentuPart = opisDokumentuArray[0];
-        return mapOfStrings.get("NumerDokumentu") + " " + opisDokumentuPart;
+        return mapWynagrodzenieOpiekuna.get("NumerDokumentu") + " " + opisDokumentuPart;
     }
 
     public String createDataKsiegowaniaDataZdarzenia() {
@@ -124,17 +124,80 @@ public class Main {
         return specificLocalDate.toString();
     }
 
-    public void wynagrodzenieOpiekunaToMap() {
-        XSSFCell cell = sheetEnova.getRow(1).getCell(3);
-        mapOfStrings.put("NumerDokumentu", createNumerDokumentu());
-        mapOfStrings.put("OpisDokumentu", createOpisDokumentu());
-        mapOfStrings.put("DataKsiegowania", createDataKsiegowaniaDataZdarzenia());
-        mapOfStrings.put("DataDokumentu", createDataDokumentu());
-        mapOfStrings.put("DataZdarzenia", createDataKsiegowaniaDataZdarzenia());
-        mapOfStrings.put("KontoWn", "500-01-02-01-01-05");
-        mapOfStrings.put("KontoMa", "TODO"); //todo
-        mapOfStrings.put("Kwota", cell.toString());
-        mapOfStrings.put("OpisDekretu", "Wynagrodzenie - opiekuna");
+    public void create4MapsWynagrodzenieZusPit(int i) {
+        XSSFCell cellKwotaWynagrodzeniaBrutto = sheetEnova.getRow(i).getCell(3);
+        XSSFCell cellName = sheetEnova.getRow(1).getCell(i);
+        XSSFCell cellKwotaZusPracodawcy = sheetEnova.getRow(i).getCell(4);
+        XSSFCell cellKwotaFP = sheetEnova.getRow(i).getCell(5);
+        XSSFCell cellKwotaFG = sheetEnova.getRow(i).getCell(6);
+        XSSFCell cellKwotaZusPracownika = sheetEnova.getRow(i).getCell(7);
+        XSSFCell cellKwotaZusPracownika26 = sheetEnova.getRow(i).getCell(8);
+        XSSFCell cellKwotaZusPracownikaZdrowotne = sheetEnova.getRow(i).getCell(9);
+        XSSFCell cellKwotaZaliczkaFiskalna = sheetEnova.getRow(i).getCell(10);
+        Double skladkiZusPracodawcy = Double.valueOf(cellKwotaZusPracodawcy.toString()) + Double.valueOf(cellKwotaFP.toString()) + Double.valueOf(cellKwotaFG.toString());
+        Double skladkiZusPracownika = Double.valueOf(cellKwotaZusPracownika.toString()) + Double.valueOf(cellKwotaZusPracownika26.toString()) + Double.valueOf(cellKwotaZusPracownikaZdrowotne.toString());
+
+        mapWynagrodzenieOpiekuna.put("NumerDokumentu", createNumerDokumentu(i));
+        mapWynagrodzenieOpiekuna.put("OpisDokumentu", createOpisDokumentu(i));
+        mapWynagrodzenieOpiekuna.put("DataKsiegowania", createDataKsiegowaniaDataZdarzenia());
+        mapWynagrodzenieOpiekuna.put("DataDokumentu", createDataDokumentu(i));
+        mapWynagrodzenieOpiekuna.put("DataZdarzenia", createDataKsiegowaniaDataZdarzenia());
+        mapWynagrodzenieOpiekuna.put("KontoWn", "500-01-02-01-01-05");
+        mapWynagrodzenieOpiekuna.put("KontoMa", findCodeIntoPlanKontByName(nameExtractor(cellName.toString())));
+        mapWynagrodzenieOpiekuna.put("Kwota", cellKwotaWynagrodzeniaBrutto.toString());
+        mapWynagrodzenieOpiekuna.put("OpisDekretu", "Wynagrodzenie - opiekuna");
+        if (skladkiZusPracodawcy != 0) {
+            mapSkladkiZusPracodawcy.put("NumerDokumentu", createNumerDokumentu(i));
+            mapSkladkiZusPracodawcy.put("OpisDokumentu", createOpisDokumentu(i));
+            mapSkladkiZusPracodawcy.put("DataKsiegowania", createDataKsiegowaniaDataZdarzenia());
+            mapSkladkiZusPracodawcy.put("DataDokumentu", createDataDokumentu(i));
+            mapSkladkiZusPracodawcy.put("DataZdarzenia", createDataKsiegowaniaDataZdarzenia());
+            mapSkladkiZusPracodawcy.put("KontoWn", "500-01-02-01-01-05");
+            mapSkladkiZusPracodawcy.put("KontoMa", "222-01");
+            mapSkladkiZusPracodawcy.put("Kwota", String.valueOf(skladkiZusPracodawcy));
+            mapSkladkiZusPracodawcy.put("OpisDekretu", "Składki ZUS Pracodawcy");
+        }
+        if (skladkiZusPracownika != 0) {
+            mapSkladkiZusPracownika.put("NumerDokumentu", createNumerDokumentu(i));
+            mapSkladkiZusPracownika.put("OpisDokumentu", createOpisDokumentu(i));
+            mapSkladkiZusPracownika.put("DataKsiegowania", createDataKsiegowaniaDataZdarzenia());
+            mapSkladkiZusPracownika.put("DataDokumentu", createDataDokumentu(i));
+            mapSkladkiZusPracownika.put("DataZdarzenia", createDataKsiegowaniaDataZdarzenia());
+            mapSkladkiZusPracownika.put("KontoWn", findCodeIntoPlanKontByName(nameExtractor(cellName.toString())));
+            mapSkladkiZusPracownika.put("KontoMa", "222-01");
+            mapSkladkiZusPracownika.put("Kwota", String.valueOf(skladkiZusPracownika));
+            mapSkladkiZusPracownika.put("OpisDekretu", "Składki ZUS Pracownika");
+        }
+        if (Double.valueOf(cellKwotaZaliczkaFiskalna.toString()) != 0) {
+            mapPodatekPit4.put("NumerDokumentu", createNumerDokumentu(i));
+            mapPodatekPit4.put("OpisDokumentu", createOpisDokumentu(i));
+            mapPodatekPit4.put("DataKsiegowania", createDataKsiegowaniaDataZdarzenia());
+            mapPodatekPit4.put("DataDokumentu", createDataDokumentu(i));
+            mapPodatekPit4.put("DataZdarzenia", createDataKsiegowaniaDataZdarzenia());
+            mapPodatekPit4.put("KontoWn", findCodeIntoPlanKontByName(nameExtractor(cellName.toString())));
+            mapPodatekPit4.put("KontoMa", "221-01");
+            mapPodatekPit4.put("Kwota", cellKwotaZaliczkaFiskalna.toString());
+            mapPodatekPit4.put("OpisDekretu", "Podatek PIT-4");
+        }
+        mapWynagrodzenieOpiekuna.forEach((key, value) -> System.out.println("Key: " + key + ", Value: " + value));
+        mapSkladkiZusPracodawcy.forEach((key, value) -> System.out.println("Key: " + key + ", Value: " + value));
+        mapSkladkiZusPracownika.forEach((key, value) -> System.out.println("Key: " + key + ", Value: " + value));
+        mapPodatekPit4.forEach((key, value) -> System.out.println("Key: " + key + ", Value: " + value));
+
+    }
+
+    public String nameExtractor(String cellName) {
+        String patternString = "(\\w+) (\\w+) \\(\\d+\\)";
+        Pattern pattern = Pattern.compile(patternString);
+        Matcher matcher = pattern.matcher(cellName);
+        if (matcher.find()) {
+            String lastName = matcher.group(1);
+            String firstName = matcher.group(2);
+            return lastName + " " + firstName;
+        } else {
+            System.out.println("No match found");
+        }
+        return "";
     }
 
 

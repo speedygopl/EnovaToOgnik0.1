@@ -33,7 +33,7 @@ public class FormExe extends JPanel implements ActionListener {
 
         Icon iconOpen = new ImageIcon("src/main/resources/Open16.gif");
         openButtonEnova = new JButton("Otwórz plik Enova", iconOpen);
-        openButtonEnova.setPreferredSize(new Dimension(200,50));
+        openButtonEnova.setPreferredSize(new Dimension(200, 50));
         openButtonEnova.setMaximumSize(new Dimension(200, 50));
         openButtonEnova.setMinimumSize(new Dimension(200, 50));
         openButtonEnova.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -42,7 +42,7 @@ public class FormExe extends JPanel implements ActionListener {
         openButtonEnova.addActionListener(this);
 
         openButtonPlan = new JButton("Otwórz plik Plan Kont", iconOpen);
-        openButtonPlan.setPreferredSize(new Dimension(200,50));
+        openButtonPlan.setPreferredSize(new Dimension(200, 50));
         openButtonPlan.setMaximumSize(new Dimension(200, 50));
         openButtonPlan.setMinimumSize(new Dimension(200, 50));
         openButtonPlan.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -51,7 +51,7 @@ public class FormExe extends JPanel implements ActionListener {
 
         Icon iconConvert = new ImageIcon("src/main/resources/save.gif");
         convertButton = new JButton("Konwertuj...", iconConvert);
-        convertButton.setPreferredSize(new Dimension(200,50));
+        convertButton.setPreferredSize(new Dimension(200, 50));
         convertButton.setMaximumSize(new Dimension(200, 50));
         convertButton.setMinimumSize(new Dimension(200, 50));
         convertButton.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -98,8 +98,6 @@ public class FormExe extends JPanel implements ActionListener {
         }
         log.setCaretPosition(log.getDocument().getLength());
 
-
-
         if (e.getSource() == openButtonEnova) {
             int returnVal = fc.showOpenDialog(FormExe.this);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -119,6 +117,11 @@ public class FormExe extends JPanel implements ActionListener {
         }
         log.setCaretPosition(log.getDocument().getLength());
 
+        if (e.getSource() == convertButton) {
+            main.setFiscalMonth();
+            main.create4MapsWynagrodzenieZusPit(6);
+        }
+        log.setCaretPosition(log.getDocument().getLength());
     }
 
 
