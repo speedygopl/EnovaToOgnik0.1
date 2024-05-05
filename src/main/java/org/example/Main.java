@@ -1,13 +1,14 @@
 package org.example;
 
 
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.ZoneId;
@@ -31,7 +32,6 @@ public class Main {
     int fiscalMonth;
     int fiscalYear = 2024;
     int lastDayOfFiscalMonth;
-    List<List<Map<String, String>>> listOfListsOfMaps = new ArrayList<>();
     List<Map<String, String>> listOfMaps = new ArrayList<>();
     Map<String, String> mapWynagrodzenieOpiekuna = new LinkedHashMap<>();
     Map<String, String> mapSkladkiZusPracodawcy = new LinkedHashMap<>();
@@ -65,11 +65,9 @@ public class Main {
         for (int i = 1; i <= lastRowNumberPlan; i++) {
             XSSFCell cell = sheetPlan.getRow(i).getCell(2);
             if (cell.toString().contains(name)) {
-                System.out.println(cell.toString());
-                System.out.println(sheetPlan.getRow(i).getCell(0).toString());
+//                System.out.println(cell.toString());
+//                System.out.println(sheetPlan.getRow(i).getCell(0).toString());
                 return sheetPlan.getRow(i).getCell(0).toString();
-            } else {
-                System.out.println("brak");
             }
         }
         System.out.println("koniec");
@@ -83,13 +81,14 @@ public class Main {
         String regex = "\\((\\d+)\\)";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(input);
+        String extractedValue = "";
         if (matcher.find()) {
-            String extractedValue = matcher.group(1);
-            System.out.println("Extracted value: " + extractedValue);
+            extractedValue = matcher.group(1);
+//            System.out.println("Extracted value: " + extractedValue);
         } else {
-            System.out.println("No match found.");
+//            System.out.println("No match found.");
         }
-        return "1/" + (fiscalMonth <= 9 ? "0" + fiscalMonth : fiscalMonth) + "/" + matcher.group(1) + "/" + fiscalYear;
+        return "1/" + (fiscalMonth <= 9 ? "0" + fiscalMonth : fiscalMonth) + "/" + extractedValue + "/" + fiscalYear;
 
     }
 
@@ -126,7 +125,7 @@ public class Main {
 
     public void create4MapsWynagrodzenieZusPit(int i) {
         XSSFCell cellKwotaWynagrodzeniaBrutto = sheetEnova.getRow(i).getCell(3);
-        XSSFCell cellName = sheetEnova.getRow(1).getCell(i);
+        XSSFCell cellName = sheetEnova.getRow(i).getCell(2);
         XSSFCell cellKwotaZusPracodawcy = sheetEnova.getRow(i).getCell(4);
         XSSFCell cellKwotaFP = sheetEnova.getRow(i).getCell(5);
         XSSFCell cellKwotaFG = sheetEnova.getRow(i).getCell(6);
@@ -146,6 +145,7 @@ public class Main {
         mapWynagrodzenieOpiekuna.put("KontoMa", findCodeIntoPlanKontByName(nameExtractor(cellName.toString())));
         mapWynagrodzenieOpiekuna.put("Kwota", cellKwotaWynagrodzeniaBrutto.toString());
         mapWynagrodzenieOpiekuna.put("OpisDekretu", "Wynagrodzenie - opiekuna");
+        listOfMaps.add(new LinkedHashMap<>(mapWynagrodzenieOpiekuna));
         if (skladkiZusPracodawcy != 0) {
             mapSkladkiZusPracodawcy.put("NumerDokumentu", createNumerDokumentu(i));
             mapSkladkiZusPracodawcy.put("OpisDokumentu", createOpisDokumentu(i));
@@ -156,6 +156,7 @@ public class Main {
             mapSkladkiZusPracodawcy.put("KontoMa", "222-01");
             mapSkladkiZusPracodawcy.put("Kwota", String.valueOf(skladkiZusPracodawcy));
             mapSkladkiZusPracodawcy.put("OpisDekretu", "Składki ZUS Pracodawcy");
+            listOfMaps.add(new LinkedHashMap<>(mapSkladkiZusPracodawcy));
         }
         if (skladkiZusPracownika != 0) {
             mapSkladkiZusPracownika.put("NumerDokumentu", createNumerDokumentu(i));
@@ -167,6 +168,7 @@ public class Main {
             mapSkladkiZusPracownika.put("KontoMa", "222-01");
             mapSkladkiZusPracownika.put("Kwota", String.valueOf(skladkiZusPracownika));
             mapSkladkiZusPracownika.put("OpisDekretu", "Składki ZUS Pracownika");
+            listOfMaps.add(new LinkedHashMap<>(mapSkladkiZusPracownika));
         }
         if (Double.valueOf(cellKwotaZaliczkaFiskalna.toString()) != 0) {
             mapPodatekPit4.put("NumerDokumentu", createNumerDokumentu(i));
@@ -178,12 +180,69 @@ public class Main {
             mapPodatekPit4.put("KontoMa", "221-01");
             mapPodatekPit4.put("Kwota", cellKwotaZaliczkaFiskalna.toString());
             mapPodatekPit4.put("OpisDekretu", "Podatek PIT-4");
+            listOfMaps.add(new LinkedHashMap<>(mapPodatekPit4));
         }
-        mapWynagrodzenieOpiekuna.forEach((key, value) -> System.out.println("Key: " + key + ", Value: " + value));
-        mapSkladkiZusPracodawcy.forEach((key, value) -> System.out.println("Key: " + key + ", Value: " + value));
-        mapSkladkiZusPracownika.forEach((key, value) -> System.out.println("Key: " + key + ", Value: " + value));
-        mapPodatekPit4.forEach((key, value) -> System.out.println("Key: " + key + ", Value: " + value));
 
+//        mapWynagrodzenieOpiekuna.forEach((key, value) -> System.out.println("Key: " + key + ", Value: " + value));
+//        mapSkladkiZusPracodawcy.forEach((key, value) -> System.out.println("Key: " + key + ", Value: " + value));
+//        mapSkladkiZusPracownika.forEach((key, value) -> System.out.println("Key: " + key + ", Value: " + value));
+//        mapPodatekPit4.forEach((key, value) -> System.out.println("Key: " + key + ", Value: " + value));
+
+    }
+
+
+    public void makeListOfMapsAndCreateResultsFile() throws IOException, InvalidFormatException {
+        for (int k = 1; k <= lastRowNumberEnova; k++) {
+            create4MapsWynagrodzenieZusPit(k);
+        }
+//        for(Map<String, String> mapa: listOfMaps){
+//            for (Map.Entry<String, String> entry : mapa.entrySet()) {
+//                System.out.println("Key: " + entry.getKey() + ", Value: " + entry.getValue());
+//            }
+//        }
+
+        System.out.println(listOfMaps.size());
+        XSSFWorkbook wbOgnik = new XSSFWorkbook();
+        XSSFSheet sheetOgnik = wbOgnik.createSheet();
+
+        //create header row
+        Row headerRow = sheetOgnik.createRow(0);
+        List<String> headers = new ArrayList<>(listOfMaps.get(0).keySet());
+        for (int i = 0; i < headers.size(); i++) {
+            Cell cell = headerRow.createCell(i);
+            cell.setCellValue(headers.get(i));
+        }
+
+        //fill data
+        int rowNum = 1;
+        for(Map<String,String> rowData : listOfMaps) {
+            Row row = sheetOgnik.createRow(rowNum++);
+            int cellNum = 0;
+            for(String key : headers) {
+                Cell cell = row.createCell(cellNum++);
+                cell.setCellValue(rowData.get(key));
+            }
+        }
+
+        //auto size columns
+        for(int i =0; i<headers.size(); i++){
+            sheetOgnik.autoSizeColumn(i);
+        }
+
+        //write the output to the file
+        try(FileOutputStream fileOut = new FileOutputStream("Ogink.xlsx")) {
+            wbOgnik.write(fileOut);
+            System.out.println("Excel file has been written successfully!!!");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //close the workbook
+        try{
+            wbOgnik.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public String nameExtractor(String cellName) {

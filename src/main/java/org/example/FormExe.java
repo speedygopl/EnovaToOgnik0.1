@@ -1,5 +1,7 @@
 package org.example;
 
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
@@ -31,7 +33,7 @@ public class FormExe extends JPanel implements ActionListener {
         fc.setFileFilter(new FileNameExtensionFilter("Excel Files", "xlsx"));
         fc.setCurrentDirectory(new File(System.getProperty("user.home") + System.getProperty("file.separator") + "Downloads"));
 
-        Icon iconOpen = new ImageIcon("src/main/resources/Open16.gif");
+        Icon iconOpen = new ImageIcon("Open16.gif");
         openButtonEnova = new JButton("Otwórz plik Enova", iconOpen);
         openButtonEnova.setPreferredSize(new Dimension(200, 50));
         openButtonEnova.setMaximumSize(new Dimension(200, 50));
@@ -49,7 +51,7 @@ public class FormExe extends JPanel implements ActionListener {
         openButtonPlan.setMargin(buttonMarigin);
         openButtonPlan.addActionListener(this);
 
-        Icon iconConvert = new ImageIcon("src/main/resources/save.gif");
+        Icon iconConvert = new ImageIcon("save.gif");
         convertButton = new JButton("Konwertuj...", iconConvert);
         convertButton.setPreferredSize(new Dimension(200, 50));
         convertButton.setMaximumSize(new Dimension(200, 50));
@@ -119,7 +121,16 @@ public class FormExe extends JPanel implements ActionListener {
 
         if (e.getSource() == convertButton) {
             main.setFiscalMonth();
-            main.create4MapsWynagrodzenieZusPit(6);
+            try {
+                main.makeListOfMapsAndCreateResultsFile();
+                log.append("Plik Ognik.xlsx utworzony !!!");
+            } catch (IOException ex) {
+                log.append(ex.toString());
+                throw new RuntimeException(ex);
+            } catch (InvalidFormatException ex) {
+                log.append(ex.toString());
+                throw new RuntimeException(ex);
+            }
         }
         log.setCaretPosition(log.getDocument().getLength());
     }
@@ -127,7 +138,7 @@ public class FormExe extends JPanel implements ActionListener {
 
     private static void createAndShowGUI() throws IOException {
         //Create and set up the window.
-        JFrame frame = new JFrame("MicrosoftDocumentReader");
+        JFrame frame = new JFrame("EnovaToOgnik converter");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 800);
 
