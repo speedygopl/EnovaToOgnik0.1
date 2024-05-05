@@ -64,7 +64,7 @@ public class Main {
         String code = "";
         for (int i = 1; i <= lastRowNumberPlan; i++) {
             XSSFCell cell = sheetPlan.getRow(i).getCell(2);
-            if (cell.toString().contains(name)) {
+            if (cell.toString().toLowerCase().contains(name.toLowerCase())) {
 //                System.out.println(cell.toString());
 //                System.out.println(sheetPlan.getRow(i).getCell(0).toString());
                 return sheetPlan.getRow(i).getCell(0).toString();
@@ -133,8 +133,10 @@ public class Main {
         XSSFCell cellKwotaZusPracownika26 = sheetEnova.getRow(i).getCell(8);
         XSSFCell cellKwotaZusPracownikaZdrowotne = sheetEnova.getRow(i).getCell(9);
         XSSFCell cellKwotaZaliczkaFiskalna = sheetEnova.getRow(i).getCell(10);
-        Double skladkiZusPracodawcy = Double.valueOf(cellKwotaZusPracodawcy.toString()) + Double.valueOf(cellKwotaFP.toString()) + Double.valueOf(cellKwotaFG.toString());
-        Double skladkiZusPracownika = Double.valueOf(cellKwotaZusPracownika.toString()) + Double.valueOf(cellKwotaZusPracownika26.toString()) + Double.valueOf(cellKwotaZusPracownikaZdrowotne.toString());
+        Double value = Double.valueOf(cellKwotaZusPracodawcy.toString()) + Double.valueOf(cellKwotaFP.toString()) + Double.valueOf(cellKwotaFG.toString());
+        Double skladkiZusPracodawcy = Math.round(value * 100.0) / 100.0;
+        Double value1 = Double.valueOf(cellKwotaZusPracownika.toString()) + Double.valueOf(cellKwotaZusPracownika26.toString()) + Double.valueOf(cellKwotaZusPracownikaZdrowotne.toString());
+        Double skladkiZusPracownika = Math.round(value1 * 100.0) / 100.0;
 
         mapWynagrodzenieOpiekuna.put("NumerDokumentu", createNumerDokumentu(i));
         mapWynagrodzenieOpiekuna.put("OpisDokumentu", createOpisDokumentu(i));
@@ -215,22 +217,22 @@ public class Main {
 
         //fill data
         int rowNum = 1;
-        for(Map<String,String> rowData : listOfMaps) {
+        for (Map<String, String> rowData : listOfMaps) {
             Row row = sheetOgnik.createRow(rowNum++);
             int cellNum = 0;
-            for(String key : headers) {
+            for (String key : headers) {
                 Cell cell = row.createCell(cellNum++);
                 cell.setCellValue(rowData.get(key));
             }
         }
 
         //auto size columns
-        for(int i =0; i<headers.size(); i++){
+        for (int i = 0; i < headers.size(); i++) {
             sheetOgnik.autoSizeColumn(i);
         }
 
         //write the output to the file
-        try(FileOutputStream fileOut = new FileOutputStream("Ogink.xlsx")) {
+        try (FileOutputStream fileOut = new FileOutputStream("Ogink.xlsx")) {
             wbOgnik.write(fileOut);
             System.out.println("Excel file has been written successfully!!!");
         } catch (IOException e) {
@@ -238,7 +240,7 @@ public class Main {
         }
 
         //close the workbook
-        try{
+        try {
             wbOgnik.close();
         } catch (IOException e) {
             e.printStackTrace();
