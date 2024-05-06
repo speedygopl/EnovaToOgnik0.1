@@ -63,7 +63,7 @@ public class Main {
     public String findCodeIntoPlanKontByName(String name) {
         String code = "";
         for (int i = 1; i <= lastRowNumberPlan; i++) {
-            XSSFCell cell = sheetPlan.getRow(i).getCell(2);
+            XSSFCell cell = sheetPlan.getRow(i).getCell(1);
             if (cell.toString().toLowerCase().contains(name.toLowerCase())) {
 //                System.out.println(cell.toString());
 //                System.out.println(sheetPlan.getRow(i).getCell(0).toString());
@@ -143,7 +143,7 @@ public class Main {
         mapWynagrodzenieOpiekuna.put("DataKsiegowania", createDataKsiegowaniaDataZdarzenia());
         mapWynagrodzenieOpiekuna.put("DataDokumentu", createDataDokumentu(i));
         mapWynagrodzenieOpiekuna.put("DataZdarzenia", createDataKsiegowaniaDataZdarzenia());
-        mapWynagrodzenieOpiekuna.put("KontoWn", "500-01-02-01-01-05");
+        mapWynagrodzenieOpiekuna.put("KontoWn", "500-01-02-02-01-01");
         mapWynagrodzenieOpiekuna.put("KontoMa", findCodeIntoPlanKontByName(nameExtractor(cellName.toString())));
         mapWynagrodzenieOpiekuna.put("Kwota", cellKwotaWynagrodzeniaBrutto.toString());
         mapWynagrodzenieOpiekuna.put("OpisDekretu", "Wynagrodzenie - opiekuna");
@@ -154,7 +154,7 @@ public class Main {
             mapSkladkiZusPracodawcy.put("DataKsiegowania", createDataKsiegowaniaDataZdarzenia());
             mapSkladkiZusPracodawcy.put("DataDokumentu", createDataDokumentu(i));
             mapSkladkiZusPracodawcy.put("DataZdarzenia", createDataKsiegowaniaDataZdarzenia());
-            mapSkladkiZusPracodawcy.put("KontoWn", "500-01-02-01-01-05");
+            mapSkladkiZusPracodawcy.put("KontoWn", "500-01-02-02-01-01");
             mapSkladkiZusPracodawcy.put("KontoMa", "222-01");
             mapSkladkiZusPracodawcy.put("Kwota", String.valueOf(skladkiZusPracodawcy));
             mapSkladkiZusPracodawcy.put("OpisDekretu", "Składki ZUS Pracodawcy");
@@ -248,17 +248,16 @@ public class Main {
     }
 
     public String nameExtractor(String cellName) {
-        String patternString = "(\\w+) (\\w+) \\(\\d+\\)";
-        Pattern pattern = Pattern.compile(patternString);
+        Pattern pattern = Pattern.compile("([a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ0-9_]+(-[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ0-9_]+)?) ([a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ0-9_]+) (\\(\\d+\\))");
         Matcher matcher = pattern.matcher(cellName);
         if (matcher.find()) {
             String lastName = matcher.group(1);
-            String firstName = matcher.group(2);
+            String firstName = matcher.group(3);
             return lastName + " " + firstName;
         } else {
-            System.out.println("No match found");
+            System.out.println(cellName + " : No match found");
         }
-        return "";
+        return "----";
     }
 
 
