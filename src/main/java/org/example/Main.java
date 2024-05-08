@@ -202,6 +202,20 @@ public class Main {
 //                System.out.println("Key: " + entry.getKey() + ", Value: " + entry.getValue());
 //            }
 //        }
+        Collections.sort(listOfMaps, new Comparator<Map<String, String>>() {
+            @Override
+            public int compare(Map<String, String> o1, Map<String, String> o2) {
+                String name1 = extractLastName(o1.get("OpisDokumentu"));
+                String name2 = extractLastName(o2.get("OpisDokumentu"));
+                return name1.compareTo(name2);
+            }
+
+            private String extractLastName(String opisDokumentu) {
+                String[] parts = opisDokumentu.split(" ");
+                return parts[1];  // Assuming the format is always [number last_name first_name]
+            }
+        });
+
 
         System.out.println(listOfMaps.size());
         XSSFWorkbook wbOgnik = new XSSFWorkbook();
