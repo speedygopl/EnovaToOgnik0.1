@@ -9,6 +9,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
+import java.text.Collator;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.ZoneId;
@@ -207,7 +208,9 @@ public class Main {
             public int compare(Map<String, String> o1, Map<String, String> o2) {
                 String name1 = extractLastName(o1.get("OpisDokumentu"));
                 String name2 = extractLastName(o2.get("OpisDokumentu"));
-                return name1.compareTo(name2);
+
+                Collator collator = Collator.getInstance(new Locale("pl", "PL"));
+                return collator.compare(name1, name2);
             }
 
             private String extractLastName(String opisDokumentu) {

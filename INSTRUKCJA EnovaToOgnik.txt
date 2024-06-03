@@ -1,0 +1,3 @@
+INSTRUKCJA do EnovaToOgnik
+
+Plik plan kont musi mieć następującą strukturę : kolumna A - kody, kolumna B - imię i nazwisko
