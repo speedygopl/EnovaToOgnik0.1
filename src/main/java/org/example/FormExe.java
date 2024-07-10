@@ -7,6 +7,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.IOException;
 
@@ -18,6 +20,8 @@ public class FormExe extends JPanel implements ActionListener {
     JButton convertButton;
     JTextArea log;
     JFileChooser fc;
+    JCheckBox checkboxByName = new JCheckBox("Sortuj po nazwisku");
+    JCheckBox checkboxByNumber = new JCheckBox("Sortuj po numerze");
     Main main = new Main();
 
 
@@ -60,12 +64,36 @@ public class FormExe extends JPanel implements ActionListener {
         convertButton.setMargin(buttonMarigin);
         convertButton.addActionListener(this);
 
+        //CHECKBOXES SETTINGS
+        checkboxByNumber.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    checkboxByName.setSelected(false);
+                    System.out.println("CheckboxByNumber is selected");
+                }
+            }
+        });
+
+        // Add item listener to handle checkbox2 events
+        checkboxByName.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    checkboxByNumber.setSelected(false);
+                    System.out.println("CheckboxByName is selected");
+                }
+            }
+        });
+        checkboxByName.setBounds(100, 100, 200, 50);
+        checkboxByNumber.setBounds(100, 100, 200, 50);
+
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS)); // BoxLayout of buttonPanel
         buttonPanel.add(Box.createRigidArea(new Dimension(20, 10)));
         buttonPanel.add(openButtonEnova);
         buttonPanel.add(Box.createRigidArea(new Dimension(20, 10)));
         buttonPanel.add(openButtonPlan);
+        buttonPanel.add(checkboxByName);
+        buttonPanel.add(checkboxByNumber);
         buttonPanel.add(Box.createRigidArea(new Dimension(20, 10)));
         buttonPanel.add(convertButton);
         buttonPanel.add(Box.createRigidArea(new Dimension(20, 10)));
@@ -122,7 +150,7 @@ public class FormExe extends JPanel implements ActionListener {
         if (e.getSource() == convertButton) {
             main.setFiscalMonth();
             try {
-                main.makeListOfMapsAndCreateResultsFile();
+                main.makeListOfMapsAndCreateResultsFile(checkboxByName.isSelected() ? "byname" : "bynumber");
                 log.append("Plik Ognik.xlsx utworzony !!!");
             } catch (IOException ex) {
                 log.append(ex.toString());

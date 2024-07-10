@@ -1,3 +1,16 @@
 INSTRUKCJA do EnovaToOgnik
 
 Plik plan kont musi mieć następującą strukturę : kolumna A - kody, kolumna B - imię i nazwisko
+Plik z Enovej musi mieć w kolejności kolumny :
+Zatwierdzona	
+Data	
+Pracownik	
+Brutto	
+Firma z u s	
+FP	
+FG	
+Składki z u s	
+Koszty z u s 26	
+NFZ	
+Zal f i s
+

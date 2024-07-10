@@ -193,21 +193,12 @@ public class Main {
 
     }
 
-
-    public void makeListOfMapsAndCreateResultsFile() throws IOException, InvalidFormatException {
-        for (int k = 1; k <= lastRowNumberEnova; k++) {
-            create4MapsWynagrodzenieZusPit(k);
-        }
-//        for(Map<String, String> mapa: listOfMaps){
-//            for (Map.Entry<String, String> entry : mapa.entrySet()) {
-//                System.out.println("Key: " + entry.getKey() + ", Value: " + entry.getValue());
-//            }
-//        }
-        Collections.sort(listOfMaps, new Comparator<Map<String, String>>() {
+    public Comparator<Map<String, String>> sortByName() {
+        return new Comparator<Map<String, String>>() {
             @Override
-            public int compare(Map<String, String> o1, Map<String, String> o2) {
-                String name1 = extractLastName(o1.get("OpisDokumentu"));
-                String name2 = extractLastName(o2.get("OpisDokumentu"));
+            public int compare(Map<String, String> t0, Map<String, String> t1) {
+                String name1 = extractLastName(t0.get("OpisDokumentu"));
+                String name2 = extractLastName(t1.get("OpisDokumentu"));
 
                 Collator collator = Collator.getInstance(new Locale("pl", "PL"));
                 return collator.compare(name1, name2);
@@ -217,7 +208,36 @@ public class Main {
                 String[] parts = opisDokumentu.split(" ");
                 return parts[1];  // Assuming the format is always [number last_name first_name]
             }
-        });
+        };
+    }
+
+    public Comparator<Map<String, String>> sortByNumber() {
+        return new Comparator<Map<String, String>>() {
+            @Override
+            public int compare(Map<String, String> t0, Map<String, String> t1) {
+                String number1 = extractNumber(t0.get("OpisDokumentu"));
+                String number2 = extractNumber(t1.get("OpisDokumentu"));
+
+                Collator collator = Collator.getInstance(new Locale("pl", "PL"));
+                return collator.compare(number1, number2);
+            }
+
+            private String extractNumber(String opisDokumentu) {
+                String[] parts = opisDokumentu.split(" ");
+                return parts[0];  // Assuming the format is always [number last_name first_name]
+            }
+        };
+    }
+
+    public void makeListOfMapsAndCreateResultsFile(String sortBy) throws IOException, InvalidFormatException {
+        for (int k = 1; k <= lastRowNumberEnova; k++) {
+            create4MapsWynagrodzenieZusPit(k);
+        }
+        if (sortBy.equals("byname")) {
+            Collections.sort(listOfMaps, sortByName());
+        } else {
+            Collections.sort(listOfMaps, sortByNumber());
+        }
 
 
         System.out.println(listOfMaps.size());
