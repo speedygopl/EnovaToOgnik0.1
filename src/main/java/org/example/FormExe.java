@@ -11,6 +11,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.IOException;
+import java.text.NumberFormat;
 
 public class FormExe extends JPanel implements ActionListener {
 
@@ -22,6 +23,10 @@ public class FormExe extends JPanel implements ActionListener {
     JFileChooser fc;
     JCheckBox checkboxByName = new JCheckBox("Sortuj po nazwisku");
     JCheckBox checkboxByNumber = new JCheckBox("Sortuj po numerze");
+
+    NumberFormat numberFormat = NumberFormat.getNumberInstance();
+    JFormattedTextField fiscalMonthField = new JFormattedTextField(numberFormat);
+    JLabel fiscalMonthLabel = new JLabel("Miesiąc obrachunkowy");
     Main main = new Main();
 
 
@@ -86,6 +91,9 @@ public class FormExe extends JPanel implements ActionListener {
         checkboxByName.setBounds(100, 100, 200, 50);
         checkboxByNumber.setBounds(100, 100, 200, 50);
 
+        // fiscal month input field
+        fiscalMonthField.setValue(0);
+
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS)); // BoxLayout of buttonPanel
         buttonPanel.add(Box.createRigidArea(new Dimension(20, 10)));
@@ -94,6 +102,9 @@ public class FormExe extends JPanel implements ActionListener {
         buttonPanel.add(openButtonPlan);
         buttonPanel.add(checkboxByName);
         buttonPanel.add(checkboxByNumber);
+        buttonPanel.add(Box.createRigidArea(new Dimension(20, 10)));
+        buttonPanel.add(fiscalMonthLabel);
+        buttonPanel.add(fiscalMonthField);
         buttonPanel.add(Box.createRigidArea(new Dimension(20, 10)));
         buttonPanel.add(convertButton);
         buttonPanel.add(Box.createRigidArea(new Dimension(20, 10)));
@@ -148,7 +159,7 @@ public class FormExe extends JPanel implements ActionListener {
         log.setCaretPosition(log.getDocument().getLength());
 
         if (e.getSource() == convertButton) {
-            main.setFiscalMonth();
+            main.setFiscalMonth(fiscalMonthField.getValue().toString());
             try {
                 main.makeListOfMapsAndCreateResultsFile(checkboxByName.isSelected() ? "byname" : "bynumber");
                 log.append("Plik Ognik.xlsx utworzony !!!");

@@ -77,44 +77,23 @@ public class Main {
 
 
     public String createNumerDokumentu(int i) {
-        final XSSFCell cell1 = sheetEnova.getRow(i).getCell(2);
-        String input = cell1.toString();
-        String regex = "\\((\\d+)\\)";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(input);
-        String extractedValue = "";
-        if (matcher.find()) {
-            extractedValue = matcher.group(1);
-//            System.out.println("Extracted value: " + extractedValue);
-        } else {
-//            System.out.println("No match found.");
-        }
-        return "1/" + (fiscalMonth <= 9 ? "0" + fiscalMonth : fiscalMonth) + "/" + extractedValue + "/" + fiscalYear;
-
+        return sheetEnova.getRow(i).getCell(2).toString();
     }
 
-    public void setFiscalMonth() { //should run before other methods
-        XSSFCell cell = sheetEnova.getRow(1).getCell(1);
-        Date date = cell.getDateCellValue();
-        LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        String formattedDate = localDate.format(formatter);
-        String[] split = formattedDate.split("-");
-        fiscalMonth = Integer.valueOf(split[1]) - 1;
+    public void setFiscalMonth(String value) { //should run before other methods
+        fiscalMonth = Integer.valueOf(value);
     }
 
     public String createDataDokumentu(int i) {
-        XSSFCell cell = sheetEnova.getRow(i).getCell(1);
+        XSSFCell cell = sheetEnova.getRow(i).getCell(3);
         Date date = cell.getDateCellValue();
         LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         return localDate.toString();
     }
 
     public String createOpisDokumentu(int i) {
-        final XSSFCell cell1 = sheetEnova.getRow(i).getCell(2);
-        String[] opisDokumentuArray = cell1.toString().split("\\((\\d+)\\)");
-        String opisDokumentuPart = opisDokumentuArray[0];
-        return mapWynagrodzenieOpiekuna.get("NumerDokumentu") + " " + opisDokumentuPart;
+        final XSSFCell cellImieNazwisko = sheetEnova.getRow(i).getCell(1);
+        return mapWynagrodzenieOpiekuna.get("NumerDokumentu") + " " + cellImieNazwisko.toString();
     }
 
     public String createDataKsiegowaniaDataZdarzenia() {
@@ -125,18 +104,18 @@ public class Main {
     }
 
     public void create4MapsWynagrodzenieZusPit(int i) {
-        XSSFCell cellKwotaWynagrodzeniaBrutto = sheetEnova.getRow(i).getCell(3);
-        XSSFCell cellName = sheetEnova.getRow(i).getCell(2);
-        XSSFCell cellKwotaZusPracodawcy = sheetEnova.getRow(i).getCell(4);
-        XSSFCell cellKwotaFP = sheetEnova.getRow(i).getCell(5);
-        XSSFCell cellKwotaFG = sheetEnova.getRow(i).getCell(6);
-        XSSFCell cellKwotaZusPracownika = sheetEnova.getRow(i).getCell(7);
-        XSSFCell cellKwotaZusPracownika26 = sheetEnova.getRow(i).getCell(8);
+        XSSFCell cellKwotaWynagrodzeniaBrutto = sheetEnova.getRow(i).getCell(5);
+        XSSFCell cellName = sheetEnova.getRow(i).getCell(1);
+        XSSFCell cellKwotaZusPracodawcy = sheetEnova.getRow(i).getCell(6);
+        XSSFCell cellKwotaFP = sheetEnova.getRow(i).getCell(7);
+//        XSSFCell cellKwotaFG = sheetEnova.getRow(i).getCell(6);
+        XSSFCell cellKwotaZusPracownika = sheetEnova.getRow(i).getCell(8);
+//        XSSFCell cellKwotaZusPracownika26 = sheetEnova.getRow(i).getCell(8);
         XSSFCell cellKwotaZusPracownikaZdrowotne = sheetEnova.getRow(i).getCell(9);
         XSSFCell cellKwotaZaliczkaFiskalna = sheetEnova.getRow(i).getCell(10);
-        Double value = Double.valueOf(cellKwotaZusPracodawcy.toString()) + Double.valueOf(cellKwotaFP.toString()) + Double.valueOf(cellKwotaFG.toString());
+        Double value = Double.valueOf(cellKwotaZusPracodawcy.toString()) + Double.valueOf(cellKwotaFP.toString());
         Double skladkiZusPracodawcy = Math.round(value * 100.0) / 100.0;
-        Double value1 = Double.valueOf(cellKwotaZusPracownika.toString()) + Double.valueOf(cellKwotaZusPracownika26.toString()) + Double.valueOf(cellKwotaZusPracownikaZdrowotne.toString());
+        Double value1 = Double.valueOf(cellKwotaZusPracownika.toString()) + Double.valueOf(cellKwotaZusPracownikaZdrowotne.toString());
         Double skladkiZusPracownika = Math.round(value1 * 100.0) / 100.0;
 
         mapWynagrodzenieOpiekuna.put("NumerDokumentu", createNumerDokumentu(i));
@@ -145,7 +124,7 @@ public class Main {
         mapWynagrodzenieOpiekuna.put("DataDokumentu", createDataDokumentu(i));
         mapWynagrodzenieOpiekuna.put("DataZdarzenia", createDataKsiegowaniaDataZdarzenia());
         mapWynagrodzenieOpiekuna.put("KontoWn", "500-01-02-02-01-01");
-        mapWynagrodzenieOpiekuna.put("KontoMa", findCodeIntoPlanKontByName(nameExtractor(cellName.toString())));
+        mapWynagrodzenieOpiekuna.put("KontoMa", findCodeIntoPlanKontByName(cellName.toString()));
         mapWynagrodzenieOpiekuna.put("Kwota", cellKwotaWynagrodzeniaBrutto.toString());
         mapWynagrodzenieOpiekuna.put("OpisDekretu", "Wynagrodzenie - opiekuna");
         listOfMaps.add(new LinkedHashMap<>(mapWynagrodzenieOpiekuna));
@@ -167,7 +146,7 @@ public class Main {
             mapSkladkiZusPracownika.put("DataKsiegowania", createDataKsiegowaniaDataZdarzenia());
             mapSkladkiZusPracownika.put("DataDokumentu", createDataDokumentu(i));
             mapSkladkiZusPracownika.put("DataZdarzenia", createDataKsiegowaniaDataZdarzenia());
-            mapSkladkiZusPracownika.put("KontoWn", findCodeIntoPlanKontByName(nameExtractor(cellName.toString())));
+            mapSkladkiZusPracownika.put("KontoWn", findCodeIntoPlanKontByName(cellName.toString()));
             mapSkladkiZusPracownika.put("KontoMa", "222-01");
             mapSkladkiZusPracownika.put("Kwota", String.valueOf(skladkiZusPracownika));
             mapSkladkiZusPracownika.put("OpisDekretu", "Składki ZUS Pracownika");
@@ -179,18 +158,12 @@ public class Main {
             mapPodatekPit4.put("DataKsiegowania", createDataKsiegowaniaDataZdarzenia());
             mapPodatekPit4.put("DataDokumentu", createDataDokumentu(i));
             mapPodatekPit4.put("DataZdarzenia", createDataKsiegowaniaDataZdarzenia());
-            mapPodatekPit4.put("KontoWn", findCodeIntoPlanKontByName(nameExtractor(cellName.toString())));
+            mapPodatekPit4.put("KontoWn", findCodeIntoPlanKontByName(cellName.toString()));
             mapPodatekPit4.put("KontoMa", "221-01");
             mapPodatekPit4.put("Kwota", cellKwotaZaliczkaFiskalna.toString());
             mapPodatekPit4.put("OpisDekretu", "Podatek PIT-4");
             listOfMaps.add(new LinkedHashMap<>(mapPodatekPit4));
         }
-
-//        mapWynagrodzenieOpiekuna.forEach((key, value) -> System.out.println("Key: " + key + ", Value: " + value));
-//        mapSkladkiZusPracodawcy.forEach((key, value) -> System.out.println("Key: " + key + ", Value: " + value));
-//        mapSkladkiZusPracownika.forEach((key, value) -> System.out.println("Key: " + key + ", Value: " + value));
-//        mapPodatekPit4.forEach((key, value) -> System.out.println("Key: " + key + ", Value: " + value));
-
     }
 
     public Comparator<Map<String, String>> sortByName() {
@@ -206,7 +179,7 @@ public class Main {
 
             private String extractLastName(String opisDokumentu) {
                 String[] parts = opisDokumentu.split(" ");
-                return parts[1];  // Assuming the format is always [number last_name first_name]
+                return parts[parts.length-2];  // Assuming the format is always [number last_name first_name]
             }
         };
     }
@@ -282,19 +255,6 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public String nameExtractor(String cellName) {
-        Pattern pattern = Pattern.compile("([a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ0-9_]+(-[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ0-9_]+)?) ([a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ0-9_]+) (\\(\\d+\\))");
-        Matcher matcher = pattern.matcher(cellName);
-        if (matcher.find()) {
-            String lastName = matcher.group(1);
-            String firstName = matcher.group(3);
-            return lastName + " " + firstName;
-        } else {
-            System.out.println(cellName + " : No match found");
-        }
-        return "----";
     }
 
 
