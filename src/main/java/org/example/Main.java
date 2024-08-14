@@ -108,9 +108,7 @@ public class Main {
         XSSFCell cellName = sheetEnova.getRow(i).getCell(1);
         XSSFCell cellKwotaZusPracodawcy = sheetEnova.getRow(i).getCell(6);
         XSSFCell cellKwotaFP = sheetEnova.getRow(i).getCell(7);
-//        XSSFCell cellKwotaFG = sheetEnova.getRow(i).getCell(6);
         XSSFCell cellKwotaZusPracownika = sheetEnova.getRow(i).getCell(8);
-//        XSSFCell cellKwotaZusPracownika26 = sheetEnova.getRow(i).getCell(8);
         XSSFCell cellKwotaZusPracownikaZdrowotne = sheetEnova.getRow(i).getCell(9);
         XSSFCell cellKwotaZaliczkaFiskalna = sheetEnova.getRow(i).getCell(10);
         Double value = Double.valueOf(cellKwotaZusPracodawcy.toString()) + Double.valueOf(cellKwotaFP.toString());

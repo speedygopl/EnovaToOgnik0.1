@@ -42,7 +42,7 @@ public class FormExe extends JPanel implements ActionListener {
         fc.setFileFilter(new FileNameExtensionFilter("Excel Files", "xlsx"));
         fc.setCurrentDirectory(new File(System.getProperty("user.home") + System.getProperty("file.separator") + "Downloads"));
 
-        Icon iconOpen = new ImageIcon("Open16.gif");
+        Icon iconOpen = new ImageIcon("src/main/resources/Open16.gif");
         openButtonEnova = new JButton("Otwórz plik Enova", iconOpen);
         openButtonEnova.setPreferredSize(new Dimension(200, 50));
         openButtonEnova.setMaximumSize(new Dimension(200, 50));
@@ -60,7 +60,7 @@ public class FormExe extends JPanel implements ActionListener {
         openButtonPlan.setMargin(buttonMarigin);
         openButtonPlan.addActionListener(this);
 
-        Icon iconConvert = new ImageIcon("save.gif");
+        Icon iconConvert = new ImageIcon("src/main/resources/save.gif");
         convertButton = new JButton("Konwertuj...", iconConvert);
         convertButton.setPreferredSize(new Dimension(200, 50));
         convertButton.setMaximumSize(new Dimension(200, 50));
@@ -92,7 +92,9 @@ public class FormExe extends JPanel implements ActionListener {
         checkboxByNumber.setBounds(100, 100, 200, 50);
 
         // fiscal month input field
-        fiscalMonthField.setValue(0);
+        Dimension fiscalMonthFieldDimension = new Dimension(30, 30);
+        fiscalMonthField.setValue(12);
+        fiscalMonthField.setPreferredSize(fiscalMonthFieldDimension);
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS)); // BoxLayout of buttonPanel
