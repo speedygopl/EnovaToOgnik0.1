@@ -31,12 +31,13 @@ public class FormExe extends JPanel implements ActionListener {
 
 
     public FormExe() throws IOException {
-        super(new BorderLayout());
+        super(new GridBagLayout());
 
         log = new JTextArea(5, 20);
         log.setMargin(new Insets(10, 5, 5, 5));
         log.setEditable(true);
         JScrollPane logScrollPane = new JScrollPane(log);
+
 
         fc = new JFileChooser();
         fc.setFileFilter(new FileNameExtensionFilter("Excel Files", "xlsx"));
@@ -78,8 +79,6 @@ public class FormExe extends JPanel implements ActionListener {
                 }
             }
         });
-
-        // Add item listener to handle checkbox2 events
         checkboxByName.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
@@ -96,24 +95,42 @@ public class FormExe extends JPanel implements ActionListener {
         fiscalMonthField.setValue(12);
         fiscalMonthField.setPreferredSize(fiscalMonthFieldDimension);
 
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS)); // BoxLayout of buttonPanel
-        buttonPanel.add(Box.createRigidArea(new Dimension(20, 10)));
-        buttonPanel.add(openButtonEnova);
-        buttonPanel.add(Box.createRigidArea(new Dimension(20, 10)));
-        buttonPanel.add(openButtonPlan);
-        buttonPanel.add(checkboxByName);
-        buttonPanel.add(checkboxByNumber);
-        buttonPanel.add(Box.createRigidArea(new Dimension(20, 10)));
-        buttonPanel.add(fiscalMonthLabel);
-        buttonPanel.add(fiscalMonthField);
-        buttonPanel.add(Box.createRigidArea(new Dimension(20, 10)));
-        buttonPanel.add(convertButton);
-        buttonPanel.add(Box.createRigidArea(new Dimension(20, 10)));
 
-        add(buttonPanel, BorderLayout.PAGE_START);
-        add(logScrollPane, BorderLayout.CENTER);
+        JPanel buttonPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, -10, 10, -10);  // Padding around components
+        gbc.anchor = GridBagConstraints.CENTER;  // Center the components
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        buttonPanel.add(openButtonEnova, gbc);
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        buttonPanel.add(openButtonPlan, gbc);
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        buttonPanel.add(checkboxByName, gbc);
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        buttonPanel.add(checkboxByNumber, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        buttonPanel.add(fiscalMonthField, gbc);
+        gbc.gridx = 1;
+        gbc.gridy = 4;
+        buttonPanel.add(fiscalMonthLabel, gbc);
+        gbc.gridx = 1;
+        gbc.gridy = 5;
+        buttonPanel.add(convertButton, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 6;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.insets = new Insets(5, 5, 5, 5);
 
+        add(buttonPanel);
+        add(logScrollPane, gbc);
     }
 
 
